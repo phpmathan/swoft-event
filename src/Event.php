@@ -11,7 +11,6 @@ namespace Swoft\Event;
 
 use ArrayAccess;
 use InvalidArgumentException;
-use Serializable;
 use function array_merge;
 use function serialize;
 use function strlen;
@@ -23,7 +22,7 @@ use function unserialize;
  *
  * @since 2.0
  */
-class Event implements EventInterface, ArrayAccess, Serializable
+class Event implements EventInterface, ArrayAccess
 {
     /**
      * @var string Event name
@@ -278,11 +277,11 @@ class Event implements EventInterface, ArrayAccess, Serializable
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function serialize(): string
+    public function __serialize(): array
     {
-        return serialize([$this->name, $this->params, $this->stopPropagation]);
+        return [$this->name, $this->params, $this->stopPropagation];
     }
 
     /**
@@ -292,13 +291,13 @@ class Event implements EventInterface, ArrayAccess, Serializable
      *
      * @return  void
      */
-    public function unserialize($serialized): void
+    public function __unserialize($serialized): void
     {
         [
             $this->name,
             $this->params,
             $this->stopPropagation
-        ] = unserialize($serialized, ['allowed_classes' => false]);
+        ] = $serialized;
     }
 
     /**
@@ -320,7 +319,7 @@ class Event implements EventInterface, ArrayAccess, Serializable
      *
      * @return  mixed  The argument value or null if not existing.
      */
-    public function offsetGet($name)
+    public function offsetGet($name): mixed
     {
         return $this->getParam($name);
     }
